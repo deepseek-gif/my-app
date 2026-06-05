@@ -1,5 +1,9 @@
 const Food = require('../models/Food');
 
+// 最近推荐的分类记录（用于多样性计算）
+const recentCategories = [];
+const MAX_RECENT_CATEGORIES = 5;
+
 // 获取所有食物
 exports.getAllFoods = async (req, res) => {
   try {
@@ -55,6 +59,155 @@ exports.getRandomFood = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// AI智能随机推荐
+exports.getAIRandomFood = async (req, res) => {
+  try {
+    const { category, cuisine } = req.query;
+
+    // 构建筛选条件
+    const filter = {};
+    if (category && category !== '不限') filter.category = category;
+    if (cuisine && cuisine !== '不限') filter.cuisine = cuisine;
+
+    // 获取所有符合条件的食物
+    const foods = await Food.find(filter);
+
+    if (foods.length === 0) {
+      return res.json({
+        success: true,
+        data: null,
+        message: '没有符合条件的食物'
+      });
+    }
+
+    // 计算每个食物的得分
+    const scoredFoods = foods.map(food => ({
+      food,
+      score: calculateAIScore(food)
+    }));
+
+    // 按得分排序，取前5个
+    const topFoods = scoredFoods
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5);
+
+    // 从top5中随机选择1个
+    const randomIndex = Math.floor(Math.random() * topFoods.length);
+    const selectedFood = topFoods[randomIndex].food;
+
+    // 记录推荐的分类，用于后续多样性计算
+    recentCategories.push(selectedFood.category);
+    if (recentCategories.length > MAX_RECENT_CATEGORIES) {
+      recentCategories.shift();
+    }
+
+    // 生成AI推荐理由
+    const aiReason = generateAIReason(selectedFood);
+
+    res.json({
+      success: true,
+      data: {
+        ...selectedFood.toObject(),
+        aiReason
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// 计算AI推荐得分
+function calculateAIScore(food) {
+  let score = 0;
+
+  // 时间匹配（50%）
+  score += getTimeMatchScore(food) * 0.5;
+
+  // 多样性（30%）
+  score += getDiversityScore(food) * 0.3;
+
+  // 随机性（20%）
+  score += Math.random() * 0.2;
+
+  return score;
+}
+
+// 时间匹配得分
+function getTimeMatchScore(food) {
+  const hour = new Date().getHours();
+
+  // 早餐时间：6-10点
+  if (hour >= 6 && hour < 10) {
+    return food.category === '早餐' ? 1 : 0.3;
+  }
+
+  // 午餐时间：10-14点
+  if (hour >= 10 && hour < 14) {
+    return food.category === '午餐' ? 1 : 0.3;
+  }
+
+  // 晚餐时间：17-21点
+  if (hour >= 17 && hour < 21) {
+    return food.category === '晚餐' ? 1 : 0.3;
+  }
+
+  // 其他时间：小吃、甜品、饮品
+  return ['小吃', '甜品', '饮品'].includes(food.category) ? 1 : 0.5;
+}
+
+// 多样性得分：避免连续推荐相同分类的食物
+function getDiversityScore(food) {
+  if (recentCategories.length === 0) {
+    return 0.8; // 没有历史记录时给较高分
+  }
+
+  // 如果该分类在最近推荐中出现过，降低分数
+  const recentIndex = recentCategories.lastIndexOf(food.category);
+  if (recentIndex !== -1) {
+    // 越近的推荐惩罚越重：最近一次0.2，更早的0.4
+    return recentIndex === recentCategories.length - 1 ? 0.2 : 0.4;
+  }
+
+  // 该分类未在最近推荐中出现，给高分
+  return 0.8;
+}
+
+// 生成AI推荐理由
+function generateAIReason(food) {
+  const hour = new Date().getHours();
+  let timeReason = '';
+
+  if (hour >= 6 && hour < 10) {
+    timeReason = '早上';
+  } else if (hour >= 10 && hour < 14) {
+    timeReason = '中午';
+  } else if (hour >= 17 && hour < 21) {
+    timeReason = '晚上';
+  } else {
+    timeReason = '现在';
+  }
+
+  let reason = `根据${timeReason}的时间，`;
+
+  if (food.category === '早餐') {
+    reason += '推荐这道营养丰富的早餐';
+  } else if (food.category === '午餐') {
+    reason += '推荐这道美味的午餐';
+  } else if (food.category === '晚餐') {
+    reason += '推荐这道丰盛的晚餐';
+  } else {
+    reason += `推荐这道${food.category}`;
+  }
+
+  if (food.taste.length > 0) {
+    reason += `，口味${food.taste.join('、')}`;
+  }
+
+  reason += `，${food.cookingTime}分钟即可完成`;
+
+  return reason;
+}
 
 // 获取单个食物
 exports.getFoodById = async (req, res) => {
