@@ -5,7 +5,7 @@ const Food = require('../models/Food');
 dotenv.config();
 
 const seedFoods = [
-  // ========== 早餐 (8道) ==========
+  // ========== 早餐 (11道) ==========
   // 中餐 x3
   { name: '豆浆油条', category: '早餐', cuisine: '中餐', taste: ['清淡'], cookingTime: 15, difficulty: '简单', description: '经典中式早餐，豆浆配上刚炸好的油条' },
   { name: '小笼包', category: '早餐', cuisine: '中餐', taste: ['鲜香'], cookingTime: 30, difficulty: '中等', description: '皮薄汁多的上海小笼包' },
@@ -23,7 +23,7 @@ const seedFoods = [
   // 韩餐 x1
   { name: '韩式紫菜包饭', category: '早餐', cuisine: '韩餐', taste: ['清淡'], cookingTime: 20, difficulty: '简单', description: '米饭蔬菜卷入紫菜，方便携带' },
 
-  // ========== 午餐 (24道) ==========
+  // ========== 午餐 (28道) ==========
   // 中餐 x16
   { name: '番茄炒蛋', category: '午餐', cuisine: '中餐', taste: ['酸', '甜'], cookingTime: 15, difficulty: '简单', description: '家常菜经典，酸甜可口' },
   { name: '宫保鸡丁', category: '午餐', cuisine: '中餐', taste: ['辣', '鲜香'], cookingTime: 25, difficulty: '中等', description: '川菜经典，花生配鸡肉，酸甜微辣' },
@@ -47,7 +47,7 @@ const seedFoods = [
   { name: '培根芝士汉堡', category: '午餐', cuisine: '西餐', taste: ['咸'], cookingTime: 15, difficulty: '简单', description: '经典美式汉堡，肉香四溢' },
   { name: '奶油培根意面', category: '午餐', cuisine: '西餐', taste: ['咸'], cookingTime: 20, difficulty: '中等', description: '浓郁奶油酱配脆培根' },
   { name: '法式焗蜗牛', category: '午餐', cuisine: '西餐', taste: ['鲜香'], cookingTime: 30, difficulty: '困难', description: '法式经典，蒜香黄油焗蜗牛' },
-  // 日料 x3
+  // 日料 x2
   { name: '日式咖喱饭', category: '午餐', cuisine: '日料', taste: ['甜', '辣'], cookingTime: 35, difficulty: '中等', description: '浓郁咖喱配上软糯米饭' },
   { name: '日式猪排饭', category: '午餐', cuisine: '日料', taste: ['咸'], cookingTime: 25, difficulty: '中等', description: '酥脆猪排配特制酱汁' },
   // 韩餐 x3
@@ -58,7 +58,7 @@ const seedFoods = [
   { name: '泰式菠萝炒饭', category: '午餐', cuisine: '东南亚', taste: ['酸', '甜'], cookingTime: 20, difficulty: '中等', description: '酸甜开胃的泰式炒饭' },
   { name: '越南河粉', category: '午餐', cuisine: '东南亚', taste: ['清淡'], cookingTime: 30, difficulty: '中等', description: '清爽鲜美的越南牛肉粉' },
 
-  // ========== 晚餐 (18道) ==========
+  // ========== 晚餐 (19道) ==========
   // 中餐 x9
   { name: '红烧肉', category: '晚餐', cuisine: '中餐', taste: ['甜', '咸'], cookingTime: 60, difficulty: '中等', description: '肥而不腻，入口即化' },
   { name: '清蒸鲈鱼', category: '晚餐', cuisine: '中餐', taste: ['清淡', '鲜香'], cookingTime: 25, difficulty: '中等', description: '鲜美嫩滑，原汁原味' },
@@ -112,13 +112,13 @@ const seedFoods = [
   // 其他 x1
   { name: '焦糖布丁', category: '甜品', cuisine: '其他', taste: ['甜'], cookingTime: 40, difficulty: '中等', description: '法式经典甜品，焦香浓郁' },
 
-  // ========== 饮品 (7道) ==========
+  // ========== 饮品 (6道) ==========
   // 中餐 x2
   { name: '杨枝甘露', category: '饮品', cuisine: '中餐', taste: ['甜', '酸'], cookingTime: 20, difficulty: '中等', description: '港式经典甜品饮品' },
   { name: '酸梅汤', category: '饮品', cuisine: '中餐', taste: ['酸', '甜'], cookingTime: 30, difficulty: '简单', description: '消暑解渴的传统饮品' },
   // 日料 x1
   { name: '抹茶拿铁', category: '饮品', cuisine: '日料', taste: ['甜', '清淡'], cookingTime: 10, difficulty: '简单', description: '日式抹茶配牛奶' },
-  // 其他 x4
+  // 其他 x3
   { name: '珍珠奶茶', category: '饮品', cuisine: '其他', taste: ['甜', '酸'], cookingTime: 15, difficulty: '简单', description: '经典台式奶茶' },
   { name: '柠檬蜂蜜水', category: '饮品', cuisine: '其他', taste: ['酸', '甜'], cookingTime: 5, difficulty: '简单', description: '清爽解渴' },
   { name: '美式咖啡', category: '饮品', cuisine: '其他', taste: ['清淡'], cookingTime: 5, difficulty: '简单', description: '提神醒脑的黑咖啡' },

@@ -3,6 +3,7 @@ const router = express.Router();
 const {
   getAllFoods,
   getRandomFood,
+  getAIRandomFood,
   getFoodById,
   createFood,
   updateFood,
@@ -16,6 +17,7 @@ router.route('/')
   .post(createFood);
 
 router.get('/random', getRandomFood);
+router.get('/ai-random', getAIRandomFood);
 router.get('/favorites', getFavorites);
 
 router.route('/:id')
