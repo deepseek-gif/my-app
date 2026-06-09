@@ -70,10 +70,10 @@ exports.getAIRandomFood = async (req, res) => {
     if (category && category !== '不限') filter.category = category;
     if (cuisine && cuisine !== '不限') filter.cuisine = cuisine;
 
-    // 获取所有符合条件的食物
-    const foods = await Food.find(filter);
+    // 获取符合条件的食物总数
+    const count = await Food.countDocuments(filter);
 
-    if (foods.length === 0) {
+    if (count === 0) {
       return res.json({
         success: true,
         data: null,
@@ -81,38 +81,36 @@ exports.getAIRandomFood = async (req, res) => {
       });
     }
 
-    // 计算每个食物的得分
-    const scoredFoods = foods.map(food => ({
-      food,
-      score: calculateAIScore(food)
-    }));
+    // 随机选择一个食物
+    const random = Math.floor(Math.random() * count);
+    const food = await Food.findOne(filter).skip(random);
 
-    // 按得分排序，取前5个
-    const topFoods = scoredFoods
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 5);
-
-    // 从top5中随机选择1个
-    const randomIndex = Math.floor(Math.random() * topFoods.length);
-    const selectedFood = topFoods[randomIndex].food;
-
-    // 记录推荐的分类，用于后续多样性计算
-    recentCategories.push(selectedFood.category);
-    if (recentCategories.length > MAX_RECENT_CATEGORIES) {
-      recentCategories.shift();
+    if (!food) {
+      return res.json({
+        success: true,
+        data: null,
+        message: '没有符合条件的食物'
+      });
     }
 
-    // 生成AI推荐理由
-    const aiReason = generateAIReason(selectedFood);
+    // 生成简单的AI推荐理由
+    const hour = new Date().getHours();
+    let timeReason = '现在';
+    if (hour >= 6 && hour < 10) timeReason = '早上';
+    else if (hour >= 10 && hour < 14) timeReason = '中午';
+    else if (hour >= 17 && hour < 21) timeReason = '晚上';
+
+    const aiReason = `根据${timeReason}的时间，推荐这道${food.category}，口味${food.taste.join('、')}，${food.cookingTime}分钟即可完成`;
 
     res.json({
       success: true,
       data: {
-        ...selectedFood.toObject(),
+        ...food.toObject(),
         aiReason
       }
     });
   } catch (error) {
+    console.error('AI随机推荐错误:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
