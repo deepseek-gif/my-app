@@ -31,6 +31,7 @@ app.use('/api/upload', require('./routes/uploadRoutes'));
 app.use('/api/history', require('./routes/historyRoutes'));
 app.use('/api/recipes', require('./routes/recipeRoutes'));
 app.use('/api/nutrition', require('./routes/nutritionRoutes'));
+app.use('/api/version', require('./routes/versionRoutes'));
 
 // 健康检查
 app.get('/api/health', (req, res) => {
